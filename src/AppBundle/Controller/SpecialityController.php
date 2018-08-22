@@ -107,16 +107,19 @@ class SpecialityController extends Controller
      */
     public function deleteAction(Request $request, Speciality $speciality)
     {
-        $form = $this->createDeleteForm($speciality);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($speciality);
+        
+        $em = $this->getDoctrine()->getManager();
+        $subSpecialities = $em->getRepository('AppBundle:SubSpeciality')->finBySpeciality($speciality->getId());
+        
+        foreach ($subSpecialities as $subEspecialidad ) {
+            $em->remove($subEspecialidad);
             $em->flush();
         }
 
-        return $this->redirectToRoute('speciality_index');
+        $em->remove($speciality);
+        $em->flush();
+        
+        return new JsonResponse(['msg' => 'Specialist deleted successfully!'], 201);
     }
 
     /**
