@@ -102,14 +102,14 @@ class SpecialityController extends Controller
     /**
      * Deletes a speciality entity.
      *
-     * @Route("/{id}", name="speciality_delete")
+     * @Route("/delete/{id}", name="speciality_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, Speciality $speciality)
     {
         
         $em = $this->getDoctrine()->getManager();
-        $subSpecialities = $em->getRepository('AppBundle:SubSpeciality')->finBySpeciality($speciality->getId());
+        $subSpecialities = $em->getRepository('AppBundle:SubSpeciality')->findBySpeciality($speciality->getId());
         
         foreach ($subSpecialities as $subEspecialidad ) {
             $em->remove($subEspecialidad);
