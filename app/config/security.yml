@@ -1,0 +1,64 @@
+# To get started with security, check out the documentation:
+# https://symfony.com/doc/current/security.html
+security:
+    encoders:
+        FOS\UserBundle\Model\UserInterface: bcrypt
+
+    role_hierarchy:
+        ROLE_ADMIN:       ROLE_USER
+        ROLE_SUPER_ADMIN: ROLE_ADMIN
+
+    providers:
+        fos_userbundle:
+            id: fos_user.user_provider.username
+
+    firewalls:
+        ## logout deprecated:
+        ## http://stackoverflow.com/questions/21978658/invalidating-json-web-tokens/23089839#23089839
+        ## https://github.com/lexik/LexikJWTAuthenticationBundle/issues/58#issuecomment-89641970
+        login:
+            pattern:  ^/api/login
+            stateless: true
+            anonymous: true
+            form_login:
+                check_path:               /api/login_check
+                username_parameter:       username
+                password_parameter:       password
+                success_handler:          lexik_jwt_authentication.handler.authentication_success
+                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+                require_previous_session: false
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        api:
+            pattern:   ^/api
+            stateless: true
+            anonymous: true
+            guard:
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator
+        main:
+            pattern: ^/
+            form_login:
+                provider: fos_userbundle
+                csrf_token_generator: security.csrf.token_manager
+                login_path: /login
+                always_use_default_target_path: false
+                default_target_path: dashboard
+            logout:
+                path:   /logout
+                target: /login
+            anonymous:    true
+            remember_me:
+                secret:   '%secret%'
+                lifetime: 60 # 1 week in seconds
+                path:     /
+
+    access_control:
+            - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+            - { path: ^/api/forgot-password, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+            - { path: ^/api,       roles: [IS_AUTHENTICATED_ANONYMOUSLY], methods: ['GET'] }
+            - { path: ^/api/user/register, roles: [IS_AUTHENTICATED_ANONYMOUSLY], methods: ['POST'] }
+            - { path: ^/api/patient/register, roles: [ROLE_ADMIN], methods: ['POST'] }
+            - { path: ^/api,       roles: [IS_AUTHENTICATED_FULLY], methods: ['POST', 'PUT', 'DELETE'] }

@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Peluqueria_patients list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Createdat</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for peluqueria_Patient in peluqueria_Patients %}
+            <tr>
+                <td><a href="{{ path('peluqueria_patient_show', { 'id': peluqueria_Patient.id }) }}">{{ peluqueria_Patient.id }}</a></td>
+                <td>{% if peluqueria_Patient.createdAt %}{{ peluqueria_Patient.createdAt|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('peluqueria_patient_show', { 'id': peluqueria_Patient.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('peluqueria_patient_edit', { 'id': peluqueria_Patient.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('peluqueria_patient_new') }}">Create a new peluqueria_Patient</a>
+        </li>
+    </ul>
+{% endblock %}

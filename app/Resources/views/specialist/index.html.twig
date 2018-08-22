@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Specialists list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Email</th>
+                <th>Phonenumber</th>
+                <th>Consultationlength</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for specialist in specialists %}
+            <tr>
+                <td><a href="{{ path('specialist_show', { 'id': specialist.id }) }}">{{ specialist.id }}</a></td>
+                <td>{{ specialist.firstName }}</td>
+                <td>{{ specialist.lastName }}</td>
+                <td>{{ specialist.email }}</td>
+                <td>{{ specialist.phoneNumber }}</td>
+                <td>{{ specialist.consultationLength }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('specialist_show', { 'id': specialist.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('specialist_edit', { 'id': specialist.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('specialist_new') }}">Create a new specialist</a>
+        </li>
+    </ul>
+{% endblock %}
