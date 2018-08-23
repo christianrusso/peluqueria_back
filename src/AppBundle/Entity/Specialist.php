@@ -57,6 +57,12 @@ class Specialist
      */
     private $consultationLength;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="specialist")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     */
+    private $user;
+
 
     /**
      * @ORM\OneToMany(targetEntity="WorkingHours", mappedBy="specialist")
@@ -230,5 +236,29 @@ class Specialist
     public function getWorkinghours()
     {
         return $this->workinghours;
+    }
+
+    /**
+     * Set user
+     *
+     * @param \AppBundle\Entity\User $user
+     *
+     * @return Specialist
+     */
+    public function setUser(\AppBundle\Entity\User $user = null)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return \AppBundle\Entity\User
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 }

@@ -5,8 +5,11 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Peluqueria_Patient;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
-
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use JMS\Serializer\SerializationContext;
 /**
  * Peluqueria_patient controller.
  *
@@ -39,22 +42,22 @@ class Peluqueria_PatientController extends Controller
      */
     public function newAction(Request $request)
     {
+        $data = $request->request->all();
+
         $peluqueria_Patient = new Peluqueria_patient();
         $form = $this->createForm('AppBundle\Form\Peluqueria_PatientType', $peluqueria_Patient);
-        $form->handleRequest($request);
+        $data["userComapny"] = $this->getUser()->getId();
+        $form->submit($data);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if (!$form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($peluqueria_Patient);
             $em->flush();
 
-            return $this->redirectToRoute('peluqueria_patient_show', array('id' => $peluqueria_Patient->getId()));
         }
 
-        return $this->render('peluqueria_patient/new.html.twig', array(
-            'peluqueria_Patient' => $peluqueria_Patient,
-            'form' => $form->createView(),
-        ));
+        return new JsonResponse(['msg' => 'Patient created successfully!'], 201);
+
     }
 
     /**

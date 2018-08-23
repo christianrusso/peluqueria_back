@@ -37,10 +37,16 @@ class Speciality
      * @ORM\OneToMany(targetEntity="SubSpeciality", mappedBy="speciality")
      */
     private $subSpecility;
+    /**
+     * @ORM\OneToMany(targetEntity="PeluqueriaSpeciality", mappedBy="speciality")
+     */
+    private $peluqueria_speciality;
 
     public function __construct()
     {
         $this->subSpecility = new ArrayCollection();
+        $this->peluqueria_speciality = new ArrayCollection();
+
     }
     /**
      * Get id
@@ -108,5 +114,39 @@ class Speciality
     public function getSubSpecility()
     {
         return $this->subSpecility;
+    }
+
+    /**
+     * Add peluqueriaSpeciality
+     *
+     * @param \AppBundle\Entity\PeluqueriaSpeciality $peluqueriaSpeciality
+     *
+     * @return Speciality
+     */
+    public function addPeluqueriaSpeciality(\AppBundle\Entity\PeluqueriaSpeciality $peluqueriaSpeciality)
+    {
+        $this->peluqueria_speciality[] = $peluqueriaSpeciality;
+
+        return $this;
+    }
+
+    /**
+     * Remove peluqueriaSpeciality
+     *
+     * @param \AppBundle\Entity\PeluqueriaSpeciality $peluqueriaSpeciality
+     */
+    public function removePeluqueriaSpeciality(\AppBundle\Entity\PeluqueriaSpeciality $peluqueriaSpeciality)
+    {
+        $this->peluqueria_speciality->removeElement($peluqueriaSpeciality);
+    }
+
+    /**
+     * Get peluqueriaSpeciality
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getPeluqueriaSpeciality()
+    {
+        return $this->peluqueria_speciality;
     }
 }

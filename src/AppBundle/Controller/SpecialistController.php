@@ -48,7 +48,9 @@ class SpecialistController extends Controller
         $data = $request->request->all();
         $specialist = new Specialist();
         $form = $this->createForm('AppBundle\Form\SpecialistType', $specialist);
+        $data["user"] = $this->getUser()->getId();
         $form->submit($data);
+
         $workingHour = json_decode($data["WorkingHours"],true);
         if (!$form->isValid()) {
             $em = $this->getDoctrine()->getManager();
@@ -76,11 +78,9 @@ class SpecialistController extends Controller
      */
     public function showAction(Specialist $specialist)
     {
-        $deleteForm = $this->createDeleteForm($specialist);
 
         return $this->render('specialist/show.html.twig', array(
             'specialist' => $specialist,
-            'delete_form' => $deleteForm->createView(),
         ));
     }
 
@@ -92,58 +92,43 @@ class SpecialistController extends Controller
      */
     public function editAction(Request $request, Specialist $specialist)
     {
-        $deleteForm = $this->createDeleteForm($specialist);
+        $data = $request->request->all();
         $editForm = $this->createForm('AppBundle\Form\SpecialistType', $specialist);
-        $editForm->handleRequest($request);
+        $editForm->submit($data);
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        if (!$editForm->isValid()) {
             $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('specialist_edit', array('id' => $specialist->getId()));
+            return new JsonResponse(['msg' => 'Specialist update successfully!'], 201);
         }
 
-        return $this->render('specialist/edit.html.twig', array(
-            'specialist' => $specialist,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
      * Deletes a specialist entity.
      *
-     * @Route("/{id}", name="specialist_delete")
+     * @Route("/{id}/delete", name="specialist_delete")
      * @Method("DELETE")
      */
-    public function deleteAction(Request $request, Specialist $specialist)
+    public function deleteAction(Request $request, Specialist $specialist=null)
     {
-        $form = $this->createDeleteForm($specialist);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($specialist);
-            $em->flush();
+        if (!($specialist)) {
+            return new JsonResponse(["msg"=>"Specialist dont exist"],400);
         }
 
-        return $this->redirectToRoute('specialist_index');
+        $em = $this->getDoctrine()->getManager();
+        $workinHours = $em->getRepository('AppBundle:WorkingHours')->findBySpecialist($specialist->getId());
+
+        foreach ($workinHours as $workinHour ) {
+            $em->remove($workinHour);
+            $em->flush();
+        }
+        $em->remove($specialist);
+        $em->flush();
+
+
+        return new JsonResponse(['msg' => 'Specialist created successfully!'], 201);
     }
 
-    /**
-     * Creates a form to delete a specialist entity.
-     *
-     * @param Specialist $specialist The specialist entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Specialist $specialist)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('specialist_delete', array('id' => $specialist->getId())))
-            ->setMethod('DELETE')
-            ->getForm()
-        ;
-    }
 
 
 }

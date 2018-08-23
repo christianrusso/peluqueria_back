@@ -28,12 +28,21 @@ class User extends BaseUser
      * @ORM\OneToMany(targetEntity="Peluqueria_Patient", mappedBy="userPatient")
      */
     private $patientUser;
-
+    /**
+     * @ORM\OneToMany(targetEntity="PeluqueriaSpeciality", mappedBy="user")
+     */
+    private $peluqueria_speciality;
+    /**
+     * @ORM\OneToMany(targetEntity="Specialist", mappedBy="user")
+     */
+    private $specialist;
     public function __construct()
     {
         parent::__construct(
             $this->patientCompany = new ArrayCollection(),
-            $this->patientUser = new ArrayCollection()
+            $this->patientUser = new ArrayCollection(),
+            $this->peluqueria_speciality = new ArrayCollection(),
+            $this->specialist = new ArrayCollection()
 
     );
         $this->roles = array('ROLE_USER');
@@ -109,5 +118,73 @@ class User extends BaseUser
     public function getPatientUser()
     {
         return $this->patientUser;
+    }
+
+    /**
+     * Add peluqueriaSpeciality
+     *
+     * @param \AppBundle\Entity\PeluqueriaSpeciality $peluqueriaSpeciality
+     *
+     * @return User
+     */
+    public function addPeluqueriaSpeciality(\AppBundle\Entity\PeluqueriaSpeciality $peluqueriaSpeciality)
+    {
+        $this->peluqueria_speciality[] = $peluqueriaSpeciality;
+
+        return $this;
+    }
+
+    /**
+     * Remove peluqueriaSpeciality
+     *
+     * @param \AppBundle\Entity\PeluqueriaSpeciality $peluqueriaSpeciality
+     */
+    public function removePeluqueriaSpeciality(\AppBundle\Entity\PeluqueriaSpeciality $peluqueriaSpeciality)
+    {
+        $this->peluqueria_speciality->removeElement($peluqueriaSpeciality);
+    }
+
+    /**
+     * Get peluqueriaSpeciality
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getPeluqueriaSpeciality()
+    {
+        return $this->peluqueria_speciality;
+    }
+
+    /**
+     * Add specialist
+     *
+     * @param \AppBundle\Entity\Specialist $specialist
+     *
+     * @return User
+     */
+    public function addSpecialist(\AppBundle\Entity\Specialist $specialist)
+    {
+        $this->specialist[] = $specialist;
+
+        return $this;
+    }
+
+    /**
+     * Remove specialist
+     *
+     * @param \AppBundle\Entity\Specialist $specialist
+     */
+    public function removeSpecialist(\AppBundle\Entity\Specialist $specialist)
+    {
+        $this->specialist->removeElement($specialist);
+    }
+
+    /**
+     * Get specialist
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getSpecialist()
+    {
+        return $this->specialist;
     }
 }

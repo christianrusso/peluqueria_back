@@ -46,10 +46,9 @@ class Peluqueria_Patient
      *
      * @return Peluqueria_Patient
      */
-    public function setCreatedAt($createdAt)
+    public function setCreatedAt($createdAt=null)
     {
-        $this->createdAt = $createdAt;
-
+        $this->createdAt = new \DateTime('now', new \DateTimeZone("America/Argentina/Cordoba"));
         return $this;
     }
 
@@ -76,4 +75,52 @@ class Peluqueria_Patient
     private $userPatient;
 
 
+
+    /**
+     * Set userComapny
+     *
+     * @param \AppBundle\Entity\User $userComapny
+     *
+     * @return Peluqueria_Patient
+     */
+    public function setUserComapny(\AppBundle\Entity\User $userComapny = null)
+    {
+        $this->userComapny = $userComapny;
+
+        return $this;
+    }
+
+    /**
+     * Get userComapny
+     *
+     * @return \AppBundle\Entity\User
+     */
+    public function getUserComapny()
+    {
+        return $this->userComapny;
+    }
+
+    /**
+     * Set userPatient
+     *
+     * @param \AppBundle\Entity\User $userPatient
+     *
+     * @return Peluqueria_Patient
+     */
+    public function setUserPatient(\AppBundle\Entity\User $userPatient = null)
+    {
+        $this->userPatient = $userPatient;
+
+        return $this;
+    }
+
+    /**
+     * Get userPatient
+     *
+     * @return \AppBundle\Entity\User
+     */
+    public function getUserPatient()
+    {
+        return $this->userPatient;
+    }
 }
