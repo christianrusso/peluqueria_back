@@ -49,6 +49,7 @@ class UserRegisterPatientController extends Controller
         $user->setUsername($data['username']);
         $user->setEmail($data['email']);
         $user->setPlainPassword($data['password']);
+        $user->addRole($data["role"]);
         $user->setEnabled(true);
         $userManager->updateUser($user);
 

@@ -13,7 +13,7 @@ class SpecialistType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('firstName')->add('lastName')->add('email')->add('phoneNumber')->add('consultationLength')->add('user');
+        $builder->add('firstName')->add('lastName')->add('email')->add('phoneNumber')->add('consultationLength')->add('user')->add('peluqueria_speciality');
     }/**
      * {@inheritdoc}
      */

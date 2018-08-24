@@ -65,4 +65,16 @@ class UserController extends Controller
 
         return new JsonResponse(["msg"=>"User deleted successfully"],201);
     }
+    /**
+     * Creates a new comment entity.
+     *
+     * @Route("/logout", name="user_logout")
+     * @Method("GET")
+     */
+    public function logoutAction()
+    {
+
+        return new JsonResponse(["msg"=>"Logout"],201);
+
+    }
 }

@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * PeluqueriaSpeciality
@@ -19,35 +20,50 @@ class PeluqueriaSpeciality
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @JMS\Groups({"peluqueria_speciality_index"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="Speciality", inversedBy="peluqueria_speciality")
      * @ORM\JoinColumn(name="speciality_id", referencedColumnName="id")
+     * @JMS\Groups({"peluqueria_speciality_index","specility_single","specialist_index"})
      */
     private $speciality;
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="peluqueria_speciality")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @JMS\Groups({"peluqueria_speciality_index","user_single"})
      */
     private $user;
 
 
     /**
      * @ORM\OneToMany(targetEntity="PeluqueriaSubSpeciality", mappedBy="peluqueria_speciality")
+     * @JMS\Groups({"peluqueria_speciality_index","peluqueriaSubspeciality_single","specialist_index"})
      */
     private $peluqueria_Subspeciality;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Specialist", mappedBy="peluqueria_speciality")
+     */
+    private $specialist;
+
 
     public function __construct()
     {
         $this->peluqueria_Subspeciality = new ArrayCollection();
+        $this->specialist = new ArrayCollection();
     }
+
+
+
+
     /**
      * Get id
      *
-     * @return int
+     * @return integer
      */
     public function getId()
     {
@@ -57,11 +73,11 @@ class PeluqueriaSpeciality
     /**
      * Set speciality
      *
-     * @param \AppBundle\Entity\Specialist $speciality
+     * @param \AppBundle\Entity\Speciality $speciality
      *
      * @return PeluqueriaSpeciality
      */
-    public function setSpeciality(\AppBundle\Entity\Specialist $speciality = null)
+    public function setSpeciality(\AppBundle\Entity\Speciality $speciality = null)
     {
         $this->speciality = $speciality;
 
@@ -71,7 +87,7 @@ class PeluqueriaSpeciality
     /**
      * Get speciality
      *
-     * @return \AppBundle\Entity\Specialist
+     * @return \AppBundle\Entity\Speciality
      */
     public function getSpeciality()
     {
@@ -81,11 +97,11 @@ class PeluqueriaSpeciality
     /**
      * Set user
      *
-     * @param \AppBundle\Entity\Specialist $user
+     * @param \AppBundle\Entity\User $user
      *
      * @return PeluqueriaSpeciality
      */
-    public function setUser(\AppBundle\Entity\Specialist $user = null)
+    public function setUser(\AppBundle\Entity\User $user = null)
     {
         $this->user = $user;
 
@@ -95,7 +111,7 @@ class PeluqueriaSpeciality
     /**
      * Get user
      *
-     * @return \AppBundle\Entity\Specialist
+     * @return \AppBundle\Entity\User
      */
     public function getUser()
     {
@@ -134,5 +150,39 @@ class PeluqueriaSpeciality
     public function getPeluqueriaSubspeciality()
     {
         return $this->peluqueria_Subspeciality;
+    }
+
+    /**
+     * Add specialist
+     *
+     * @param \AppBundle\Entity\Specialist $specialist
+     *
+     * @return PeluqueriaSpeciality
+     */
+    public function addSpecialist(\AppBundle\Entity\Specialist $specialist)
+    {
+        $this->specialist[] = $specialist;
+
+        return $this;
+    }
+
+    /**
+     * Remove specialist
+     *
+     * @param \AppBundle\Entity\Specialist $specialist
+     */
+    public function removeSpecialist(\AppBundle\Entity\Specialist $specialist)
+    {
+        $this->specialist->removeElement($specialist);
+    }
+
+    /**
+     * Get specialist
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getSpecialist()
+    {
+        return $this->specialist;
     }
 }

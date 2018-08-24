@@ -43,7 +43,6 @@ class Peluqueria_PatientController extends Controller
     public function newAction(Request $request)
     {
         $data = $request->request->all();
-
         $peluqueria_Patient = new Peluqueria_patient();
         $form = $this->createForm('AppBundle\Form\Peluqueria_PatientType', $peluqueria_Patient);
         $data["userComapny"] = $this->getUser()->getId();

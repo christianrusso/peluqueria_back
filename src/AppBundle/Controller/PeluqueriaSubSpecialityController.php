@@ -5,8 +5,11 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\PeluqueriaSubSpeciality;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
-
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use JMS\Serializer\SerializationContext;
 /**
  * Peluqueriasubspeciality controller.
  *
@@ -39,22 +42,20 @@ class PeluqueriaSubSpecialityController extends Controller
      */
     public function newAction(Request $request)
     {
+        $data = $request->request->all();
+
         $peluqueriaSubSpeciality = new Peluqueriasubspeciality();
         $form = $this->createForm('AppBundle\Form\PeluqueriaSubSpecialityType', $peluqueriaSubSpeciality);
-        $form->handleRequest($request);
+        $form->submit($data);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if (! $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($peluqueriaSubSpeciality);
             $em->flush();
-
-            return $this->redirectToRoute('peluqueriasubspeciality_show', array('id' => $peluqueriaSubSpeciality->getId()));
         }
 
-        return $this->render('peluqueriasubspeciality/new.html.twig', array(
-            'peluqueriaSubSpeciality' => $peluqueriaSubSpeciality,
-            'form' => $form->createView(),
-        ));
+        return new JsonResponse(['msg' => 'Specialist created successfully!'], 201);
+
     }
 
     /**
@@ -65,11 +66,9 @@ class PeluqueriaSubSpecialityController extends Controller
      */
     public function showAction(PeluqueriaSubSpeciality $peluqueriaSubSpeciality)
     {
-        $deleteForm = $this->createDeleteForm($peluqueriaSubSpeciality);
 
         return $this->render('peluqueriasubspeciality/show.html.twig', array(
             'peluqueriaSubSpeciality' => $peluqueriaSubSpeciality,
-            'delete_form' => $deleteForm->createView(),
         ));
     }
 
@@ -81,7 +80,6 @@ class PeluqueriaSubSpecialityController extends Controller
      */
     public function editAction(Request $request, PeluqueriaSubSpeciality $peluqueriaSubSpeciality)
     {
-        $deleteForm = $this->createDeleteForm($peluqueriaSubSpeciality);
         $editForm = $this->createForm('AppBundle\Form\PeluqueriaSubSpecialityType', $peluqueriaSubSpeciality);
         $editForm->handleRequest($request);
 
@@ -94,7 +92,6 @@ class PeluqueriaSubSpecialityController extends Controller
         return $this->render('peluqueriasubspeciality/edit.html.twig', array(
             'peluqueriaSubSpeciality' => $peluqueriaSubSpeciality,
             'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
         ));
     }
 
@@ -106,31 +103,58 @@ class PeluqueriaSubSpecialityController extends Controller
      */
     public function deleteAction(Request $request, PeluqueriaSubSpeciality $peluqueriaSubSpeciality)
     {
-        $form = $this->createDeleteForm($peluqueriaSubSpeciality);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->remove($peluqueriaSubSpeciality);
             $em->flush();
-        }
+
 
         return $this->redirectToRoute('peluqueriasubspeciality_index');
     }
 
     /**
-     * Creates a form to delete a peluqueriaSubSpeciality entity.
+     * Finds and displays a speciality entity.
      *
-     * @param PeluqueriaSubSpeciality $peluqueriaSubSpeciality The peluqueriaSubSpeciality entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @Route("/get/AllForSelect", name="speciality_ByLetter_peluqueriaSubSpeciality")
+     * @Method("POST")
      */
-    private function createDeleteForm(PeluqueriaSubSpeciality $peluqueriaSubSpeciality)
+    public function getAllForSelectAction(Request $request)
     {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('peluqueriasubspeciality_delete', array('id' => $peluqueriaSubSpeciality->getId())))
-            ->setMethod('DELETE')
-            ->getForm()
-        ;
+        $data = json_decode($request->getContent(),true);
+        $em = $this->getDoctrine()->getManager();
+        $repository = $em->getRepository("AppBundle:PeluqueriaSpeciality");
+
+        if ($data["id"]==-1){
+            $query = $repository->createQueryBuilder('s')
+                ->select(array(
+                        'sp.id',
+                        'sp.description as text',
+                    )
+                )
+                ->innerJoin('AppBundle:PeluqueriaSubSpeciality', 'sp', 'WITH', 'sp.peluqueria_speciality = s.id')
+                ->andWhere('s.user = :id')
+                ->setParameter('id', $this->getUser()->getId())
+                ->setMaxResults(10000);
+        }else{
+            $query = $repository->createQueryBuilder('s')
+                ->select(array(
+                        'sp.id',
+                        'sp.description as text',
+                    )
+                )
+                ->innerJoin('AppBundle:PeluqueriaSubSpeciality', 'sp', 'WITH', 'sp.peluqueria_speciality = s.id')
+                ->where('sp.peluqueria_speciality= :idSub')
+                ->andWhere('s.user = :id')
+                ->setParameter('id', $this->getUser()->getId())
+                ->setParameter('idSub', $data["id"])
+                ->setMaxResults(10000);
+        }
+
+
+        $specialities=$query->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+
+        return new JsonResponse($specialities);
+
     }
 }

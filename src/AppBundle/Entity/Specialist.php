@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Specialist
@@ -19,6 +20,7 @@ class Specialist
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @JMS\Groups({"specialist_index", "workingHours_single"})
      */
     private $id;
 
@@ -26,6 +28,7 @@ class Specialist
      * @var string
      *
      * @ORM\Column(name="firstName", type="string", length=255)
+     * @JMS\Groups({"specialist_index", "workingHours_single"})
      */
     private $firstName;
 
@@ -33,6 +36,7 @@ class Specialist
      * @var string
      *
      * @ORM\Column(name="lastName", type="string", length=255, nullable=true)
+     * @JMS\Groups({"specialist_index", "workingHours_single"})
      */
     private $lastName;
 
@@ -40,6 +44,7 @@ class Specialist
      * @var string
      *
      * @ORM\Column(name="email", type="string", length=255, nullable=true)
+     * @JMS\Groups({"specialist_index", "workingHours_single"})
      */
     private $email;
 
@@ -47,6 +52,7 @@ class Specialist
      * @var string
      *
      * @ORM\Column(name="phoneNumber", type="string", length=255, nullable=true)
+     * @JMS\Groups({"specialist_index", "workingHours_single"})
      */
     private $phoneNumber;
 
@@ -54,6 +60,7 @@ class Specialist
      * @var string
      *
      * @ORM\Column(name="consultationLength", type="string", length=255, nullable=true)
+     * @JMS\Groups({"specialist_index"})
      */
     private $consultationLength;
 
@@ -66,18 +73,31 @@ class Specialist
 
     /**
      * @ORM\OneToMany(targetEntity="WorkingHours", mappedBy="specialist")
+     * @JMS\Groups({"specialist_index"})
      */
     private $workinghours;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="PeluqueriaSpeciality", inversedBy="specialist")
+     * @ORM\JoinColumn(name="peluqueriaSpeciality_id", referencedColumnName="id")
+     * @JMS\Groups({"specialist_index"})
+     */
+    private $peluqueria_speciality;
+
+
 
     public function __construct()
     {
         $this->workinghours = new ArrayCollection();
+
     }
+
+
 
     /**
      * Get id
      *
-     * @return int
+     * @return integer
      */
     public function getId()
     {
@@ -205,6 +225,30 @@ class Specialist
     }
 
     /**
+     * Set user
+     *
+     * @param \AppBundle\Entity\User $user
+     *
+     * @return Specialist
+     */
+    public function setUser(\AppBundle\Entity\User $user = null)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return \AppBundle\Entity\User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
      * Add workinghour
      *
      * @param \AppBundle\Entity\WorkingHours $workinghour
@@ -239,26 +283,26 @@ class Specialist
     }
 
     /**
-     * Set user
+     * Set peluqueriaSpeciality
      *
-     * @param \AppBundle\Entity\User $user
+     * @param \AppBundle\Entity\PeluqueriaSpeciality $peluqueriaSpeciality
      *
      * @return Specialist
      */
-    public function setUser(\AppBundle\Entity\User $user = null)
+    public function setPeluqueriaSpeciality(\AppBundle\Entity\PeluqueriaSpeciality $peluqueriaSpeciality = null)
     {
-        $this->user = $user;
+        $this->peluqueria_speciality = $peluqueriaSpeciality;
 
         return $this;
     }
 
     /**
-     * Get user
+     * Get peluqueriaSpeciality
      *
-     * @return \AppBundle\Entity\User
+     * @return \AppBundle\Entity\PeluqueriaSpeciality
      */
-    public function getUser()
+    public function getPeluqueriaSpeciality()
     {
-        return $this->user;
+        return $this->peluqueria_speciality;
     }
 }

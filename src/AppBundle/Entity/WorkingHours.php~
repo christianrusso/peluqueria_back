@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * WorkingHours
@@ -18,6 +19,7 @@ class WorkingHours
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @JMS\Groups({"workingHours_index", "workingHours_single","specialist_index",})
      */
     private $id;
 
@@ -25,6 +27,7 @@ class WorkingHours
      * @var string
      *
      * @ORM\Column(name="dayNumber", type="string", length=255)
+     * @JMS\Groups({"workingHours_index", "workingHours_single","specialist_index",})
      */
     private $dayNumber;
 
@@ -32,6 +35,7 @@ class WorkingHours
      * @var \DateTime
      *
      * @ORM\Column(name="start", type="time")
+     * @JMS\Groups({"workingHours_index", "workingHours_single","specialist_index",})
      */
     private $start;
 
@@ -39,12 +43,14 @@ class WorkingHours
      * @var \DateTime
      *
      * @ORM\Column(name="end", type="time")
+     * @JMS\Groups({"workingHours_index", "workingHours_single","specialist_index",})
      */
     private $end;
 
     /**
      * @ORM\ManyToOne(targetEntity="Specialist", inversedBy="workinghours")
      * @ORM\JoinColumn(name="specialist_id", referencedColumnName="id")
+     *
      */
     private $specialist;
 

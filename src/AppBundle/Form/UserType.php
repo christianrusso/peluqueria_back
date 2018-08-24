@@ -8,7 +8,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserType extends AbstractType
 {
-/**
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->add('description')->add('address')->add('city')->add('latitude')->add('longitude')->add('logo');
+    }/**
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)

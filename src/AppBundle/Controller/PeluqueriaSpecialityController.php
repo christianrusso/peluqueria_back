@@ -27,12 +27,9 @@ class PeluqueriaSpecialityController extends Controller
     public function indexAction()
     {
         $em = $this->getDoctrine()->getManager();
-
-        $peluqueriaSpecialities = $em->getRepository('AppBundle:PeluqueriaSpeciality')->findAll();
-
-        return $this->render('peluqueriaspeciality/index.html.twig', array(
-            'peluqueriaSpecialities' => $peluqueriaSpecialities,
-        ));
+        $specialities= $em->getRepository('AppBundle:PeluqueriaSpeciality')->findBy( ['user' =>$this->getUser()->getId()]);
+        $specialities = $this->get('jms_serializer')->serialize($specialities, 'json', SerializationContext::create()->setGroups(array('peluqueria_speciality_index')));
+        return new Response($specialities);
     }
 
     /**
@@ -68,11 +65,9 @@ class PeluqueriaSpecialityController extends Controller
      */
     public function showAction(PeluqueriaSpeciality $peluqueriaSpeciality)
     {
-        $deleteForm = $this->createDeleteForm($peluqueriaSpeciality);
 
         return $this->render('peluqueriaspeciality/show.html.twig', array(
             'peluqueriaSpeciality' => $peluqueriaSpeciality,
-            'delete_form' => $deleteForm->createView(),
         ));
     }
 
@@ -84,56 +79,122 @@ class PeluqueriaSpecialityController extends Controller
      */
     public function editAction(Request $request, PeluqueriaSpeciality $peluqueriaSpeciality)
     {
-        $deleteForm = $this->createDeleteForm($peluqueriaSpeciality);
-        $editForm = $this->createForm('AppBundle\Form\PeluqueriaSpecialityType', $peluqueriaSpeciality);
-        $editForm->handleRequest($request);
+        $data = $request->request->all();
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
+        $editForm = $this->createForm('AppBundle\Form\PeluqueriaSpecialityType', $peluqueriaSpeciality);
+        $editForm->submit($data);
+
+        if (!$editForm->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('peluqueriaspeciality_edit', array('id' => $peluqueriaSpeciality->getId()));
+            return new JsonResponse(['msg' => 'Specialist edit successfully!'], 201);
         }
 
-        return $this->render('peluqueriaspeciality/edit.html.twig', array(
-            'peluqueriaSpeciality' => $peluqueriaSpeciality,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
+
     }
 
     /**
      * Deletes a peluqueriaSpeciality entity.
      *
-     * @Route("/{id}", name="peluqueriaspeciality_delete")
+     * @Route("/{id}/delete", name="peluqueriaspeciality_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, PeluqueriaSpeciality $peluqueriaSpeciality)
     {
-        $form = $this->createDeleteForm($peluqueriaSpeciality);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $subSpecialities = $em->getRepository('AppBundle:PeluqueriaSubSpeciality')->findBySpeciality($peluqueriaSpeciality->getId());
+
+            foreach ($subSpecialities as $subEspecialidad ) {
+                $em->remove($subEspecialidad);
+                $em->flush();
+            }
             $em = $this->getDoctrine()->getManager();
             $em->remove($peluqueriaSpeciality);
             $em->flush();
-        }
 
-        return $this->redirectToRoute('peluqueriaspeciality_index');
+
+        return new JsonResponse(['msg' => 'Specialist delete successfully!'], 201);
     }
 
     /**
-     * Creates a form to delete a peluqueriaSpeciality entity.
+     * Finds and displays a speciality entity.
      *
-     * @param PeluqueriaSpeciality $peluqueriaSpeciality The peluqueriaSpeciality entity
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @Route("/byLetter/{letter}", name="speciality_ByLetter_peluqueriaSpeciality")
+     * @Method("GET")
      */
-    private function createDeleteForm(PeluqueriaSpeciality $peluqueriaSpeciality)
+    public function findByLetterAction($letter)
     {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('peluqueriaspeciality_delete', array('id' => $peluqueriaSpeciality->getId())))
-            ->setMethod('DELETE')
-            ->getForm()
-        ;
+
+        $em = $this->getDoctrine()->getManager();
+        if ($letter=="All" or $letter =="all"){
+            $repository = $em->getRepository("AppBundle:PeluqueriaSpeciality");
+            $query = $repository->createQueryBuilder('s')
+                ->select(array(
+                        's.id',
+                        'sp.description as text',
+                    )
+                )
+                ->innerJoin('AppBundle:Speciality', 'sp', 'WITH', 'sp.id = s.speciality')
+
+                ->andWhere('s.user = :id')
+                ->setParameter('id', $this->getUser()->getId())
+                ->setMaxResults(10000)
+            ;
+            $specialities=$query->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+        }else{
+            $repository = $em->getRepository("AppBundle:PeluqueriaSpeciality");
+            $query = $repository->createQueryBuilder('s')
+                ->select(array(
+                        's.id',
+                        'sp.description as text',
+                    )
+                )
+                ->innerJoin('AppBundle:Speciality', 'sp', 'WITH', 'sp.id = s.speciality')
+                ->andWhere('s.user = :id')
+                ->setParameter('id', $this->getUser()->getId())
+                ->setMaxResults(10000)
+            ;
+            $specialities=$query->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+        }
+
+        return new JsonResponse($specialities);
+
     }
+
+    /**
+     * Finds and displays a speciality entity.
+     *
+     * @Route("/byText/{text}", name="speciality_ByText_peluqueriaSpeciality")
+     * @Method("GET")
+     */
+    public function findByTextAction($text)
+    {
+
+        $em = $this->getDoctrine()->getManager();
+
+        $repository = $em->getRepository("AppBundle:PeluqueriaSpeciality");
+        $query = $repository->createQueryBuilder('s')
+            ->select(array(
+                    's.id',
+                    'sp.description',
+                )
+            )
+            ->innerJoin('AppBundle:Speciality', 'sp', 'WITH', 'sp.id = s.speciality')
+            ->where('sp.description LIKE :letter')
+            ->andWhere('s.user = :idUser')
+            ->setParameter('letter', '%'.$text.'%')
+            ->setParameter('idUser', $this->getUser()->getId())
+            ->setMaxResults(10000)
+        ;
+        $specialities=$query->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+        $specialities = $this->get('jms_serializer')->serialize($specialities, 'json', SerializationContext::create()->setGroups(array('peluqueria_speciality_index')));
+        return new Response($specialities);
+    }
+
+
+
 }

@@ -30,13 +30,52 @@ class SpecialistController extends Controller
 
         $em = $this->getDoctrine()->getManager();
 
-        $specialists = $em->getRepository('AppBundle:Specialist')->findAll();
+        $specialists = $em->getRepository('AppBundle:Specialist')->findByUser($this->getUser()->getId());
 
-        return $this->render('specialist/index.html.twig', array(
-            'specialists' => $specialists,
-        ));
+
+        $specialists = $this->get('jms_serializer')->serialize($specialists, 'json', SerializationContext::create()->setGroups(array('specialist_index')));
+
+        return new Response($specialists);
+
     }
 
+    /**
+     * Finds and displays a speciality entity.
+     *
+     * @Route("/AllForSelect", name="Specialist_filter")
+     * @Method("POST")
+     */
+    public function getAllForSelecSpecilisttAction(Request $request)
+    {
+        $data = json_decode($request->getContent(),true);
+        $em = $this->getDoctrine()->getManager();
+        $repository = $em->getRepository("AppBundle:Specialist");
+
+        $query = $repository->createQueryBuilder('sp')
+            ->select(array(
+                    'sp',
+                    's',
+                    'hour',
+
+                )
+            )
+            ->innerJoin('AppBundle:PeluqueriaSpeciality', 'pSpe', 'WITH', 'pSpe.id = sp.peluqueria_speciality')
+            ->innerJoin('AppBundle:Speciality', 's', 'WITH', 's.id= pSpe.speciality')
+            ->innerJoin('AppBundle:PeluqueriaSubSpeciality', 'sub', 'WITH', 'sub.peluqueria_speciality= pSpe.id')
+            ->innerJoin('AppBundle:WorkingHours', 'hour', 'WITH', 'hour.specialist = sp.id')
+
+            ->where('sp.user= :id')
+            ->setParameter('id', $this->getUser()->getId())
+            ->setMaxResults(10000);
+
+
+
+        $specialities=$query->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+
+        return new JsonResponse($specialities);
+
+    }
     /**
      * Creates a new specialist entity.
      *

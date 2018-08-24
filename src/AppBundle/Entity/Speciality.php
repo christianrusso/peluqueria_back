@@ -20,7 +20,7 @@ class Speciality
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Groups({"specility_index"})
+     * @JMS\Groups({"specility_index","specialist_index"})
 
      */
     private $id;
@@ -29,7 +29,8 @@ class Speciality
      * @var string
      *
      * @ORM\Column(name="description", type="string", length=255)
-     * @JMS\Groups({"specility_index"})
+     * @JMS\Groups({"specility_index","peluqueria_speciality_index","specility_single","specialist_index"})
+
      */
     private $description;
 

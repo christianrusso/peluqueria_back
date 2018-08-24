@@ -49,6 +49,13 @@ class UserRegisterController extends Controller
         $user->setUsername($data['username']);
         $user->setEmail($data['email']);
         $user->setPlainPassword($data['password']);
+        $user->addRole($data["role"]);
+        $user->setCity($data["city"]);
+        $user->setDescription($data["description"]);
+        $user->setAddress($data["address"]);
+        $user->setLatitude($data["latitude"]);
+        $user->setLongitude($data["longitude"]);
+        $user->setLogo($data["logo"]);
         $user->setEnabled(true);
         $userManager->updateUser($user);
 

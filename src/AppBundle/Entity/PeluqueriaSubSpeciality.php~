@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * PeluqueriaSubSpeciality
@@ -25,6 +26,7 @@ class PeluqueriaSubSpeciality
      * @var string
      *
      * @ORM\Column(name="description", type="string", length=255)
+     * @JMS\Groups({"peluqueriaSubspeciality_index","peluqueria_speciality_index","peluqueriaSubspeciality_single"})
      */
     private $description;
 
@@ -32,12 +34,14 @@ class PeluqueriaSubSpeciality
      * @var int
      *
      * @ORM\Column(name="duration", type="integer")
+     * @JMS\Groups({"peluqueriaSubspeciality_index","peluqueria_speciality_index","peluqueriaSubspeciality_single"})
      */
     private $duration;
 
     /**
      * @ORM\ManyToOne(targetEntity="PeluqueriaSpeciality", inversedBy="peluqueria_Subspeciality")
      * @ORM\JoinColumn(name="peluqueria_speciality_id", referencedColumnName="id")
+     * @JMS\Groups({"peluqueriaSubspeciality_index","peluqueria_speciality_index","peluqueriaSubspeciality_single"})
      */
     private $peluqueria_speciality;
     /**
